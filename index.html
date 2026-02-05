@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cumple Ruth</title>
+    <style>
+        /* Fuente pixelada */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fce4ec; /* Fondo rosa claro */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+        }
+
+        /* Fondo de corazones */
+        .background-hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23ffcdd2"><path d="M10 3.22l-.61-.6a5.5 5.5 0 0 0-7.78 7.77L10 18.78l8.39-8.4a5.5 5.5 0 0 0-7.78-7.77l-.61.61z"/></svg>');
+            background-size: 40px 40px;
+            opacity: 0.5;
+            z-index: -1;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Contenedor principal */
+        .container {
+            text-align: center;
+            position: relative;
+        }
+
+        /* Estilos para el sobre */
+        .envelope {
+            width: 200px;
+            height: 140px;
+            background-color: #f8bbd0;
+            position: relative;
+            margin: 0 auto;
+            cursor: pointer;
+            border: 4px solid #f48fb1;
+            border-radius: 4px;
+            transition: transform 0.3s;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-top: 70px solid #f06292;
+        }
+
+        .envelope::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-left: 100px solid #f8bbd0;
+            border-right: 100px solid #f8bbd0;
+            border-top: 70px solid transparent;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #e91e63;
+            font-size: 24px;
+            z-index: 2;
+        }
+
+        .letter-text {
+            margin-top: 10px;
+            color: #880e4f;
+            font-size: 12px;
+        }
+
+        /* Estilos para la ventana emergente */
+        .window-popup {
+            display: none;
+            background-color: #ffcdd2;
+            border: 4px solid #e91e63;
+            padding: 2px;
+            width: 300px;
+            position: relative;
+            image-rendering: pixelated;
+            box-shadow: 5px 5px 0px #c2185b;
+        }
+
+        .title-bar {
+            background-color: #e91e63;
+            color: white;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .window-controls span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            margin-left: 2px;
+            border: 2px solid #fff;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+            background-color: #ffcdd2;
+        }
+
+        .content img {
+            width: 80px;
+            height: 80px;
+            margin: 15px auto;
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        .question {
+            color: #880e4f;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Botones */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            height: 40px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            border: 3px solid #e91e63;
+            background-color: #f8bbd0;
+            color: #880e4f;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 3px 3px 0px #c2185b;
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px 0px #c2185b;
+        }
+
+        #no-btn {
+            position: absolute;
+            left: 60%; /* Posición inicial relativa al contenedor */
+            transition: all 0.3s ease; /* Transición suave para el movimiento */
+        }
+        
+        #yes-btn {
+            position: absolute;
+            left: 10%;
+        }
+
+        /* Sección de confirmación final */
+        .confirmation {
+            display: none;
+            text-align: center;
+        }
+
+        .confirmation h2 {
+            color: #e91e63;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .confirmation p {
+            color: #880e4f;
+            font-size: 10px;
+        }
+        
+        .confirmation img {
+            width: 80px;
+            height: 80px;
+            margin: 15px auto;
+            display: block;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-hearts"></div>
+
+    <div class="container">
+        <div class="envelope-container" id="envelope-container">
+            <p class="letter-text" style="font-size: 15px;">INVITACIÓN DE CUMPLE</p>
+            <div class="envelope" id="envelope">
+                <div class="heart"><span style="font-size: 45px;">♥</span></div>
+            </div>
+            <div class="letter-text">♡ Feliz cumple Ruth ♡</div>
+        </div>
+
+        <div class="window-popup" id="window-popup">
+            <div class="title-bar">
+                <span>I<span style="font-size: 3px;"> </span><span style="font-size: 16px;">♥</span><span style="font-size: 3px;"> </span>YOU</span>
+                <div class="window-controls">
+                    <span style="background-color: #f48fb1;"></span>
+                    <span style="background-color: #f48fb1;"></span>
+                </div>
+            </div>
+            <div class="content">
+                <div class="question">Para poder ver la invitación debes de <span style="color: rgb(32, 128, 32);">aceptar</span> las condiciones:</div>
+                <img src="gif/swiming-dog.gif" alt="Pixel Cat">
+                <div class="buttons">
+                    <button class="btn" id="yes-btn">ACEPTO</button>
+                    <button class="btn" id="no-btn">NO</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirmation" id="confirmation">
+            <div class="window-popup" style="display: block;">
+                <div class="title-bar">
+                    <span>I<span style="font-size: 3px;"> </span><span style="font-size: 16px;">♥</span><span style="font-size: 3px;"> </span>YOU</span>
+                    <div class="window-controls">
+                        <span style="background-color: #f48fb1;"></span>
+                        <span style="background-color: #f48fb1;"></span>
+                    </div>
+                </div>
+                <div class="content">
+                    <h2>SIUUU<br>INVITACIÓN DE CUMPLEAÑOS:</h2>
+                    <img src="gif/jake-dog.gif" alt="Pixel Cat Happy">
+                    
+                    <p>- Helado negro (o similar)<br><span style="font-size: 6px;">(si te apetece)</span></p>
+                    <p>+</p>
+                    <p>- 1x NOCHE DE CINE (Si quieres tú eliges la película, y OBLIGATORIO yo pago) y/o <span style="font-size: medium;">∞</span>x NOCHES DE CINE EN CASA.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos del DOM
+        const envelope = document.getElementById('envelope');
+        const envelopeContainer = document.getElementById('envelope-container');
+        const windowPopup = document.getElementById('window-popup');
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const confirmation = document.getElementById('confirmation');
+        const buttonsContainer = document.querySelector('.buttons');
+
+        // Evento para abrir el sobre
+        envelope.addEventListener('click', () => {
+            envelopeContainer.style.display = 'none';
+            windowPopup.style.display = 'block';
+        });
+
+        // Función para mover el botón "NO" aleatoriamente
+        function moveButton() {
+            const containerRect = buttonsContainer.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            // Calcular los límites para el movimiento
+            const maxX = containerRect.width - btnRect.width;
+            const maxY = containerRect.height - btnRect.height;
+            
+            // Generar nuevas coordenadas aleatorias dentro del contenedor
+            const newX = Math.random() * maxX;
+            // El movimiento en Y se limita para que no se superponga demasiado
+            const newY = Math.random() * (maxY - btnRect.height/2); 
+
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+        }
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton);
+
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveButton();
+        });
+
+
+        // Evento para el botón "YES"
+        yesBtn.addEventListener('click', () => {
+            windowPopup.style.display = 'none';
+            confirmation.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
